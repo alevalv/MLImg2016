@@ -1,7 +1,8 @@
 
 #include "imgreader.h"
 #include "preprocessor.h"
-#include "featuredetection/Harris.h"
+#include "featuredetection/Corner.h"
+#include "featuredetection/Feature.h"
 
 using namespace std;
 using namespace cv;
@@ -9,9 +10,15 @@ using namespace cv;
 #define IMAGE_DIR "../../DRIVE/"
 #define WINDOW_NAME "window"
 
-int main(int argc, char* argv[])
+void showImage(const Mat& image)
 {
     namedWindow(WINDOW_NAME, WINDOW_FREERATIO);
+    imshow(WINDOW_NAME, image);
+    waitKey(0);
+}
+
+int main(int argc, char* argv[])
+{
 
     ImgReader reader = ImgReader(IMAGE_DIR);
     reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
@@ -21,9 +28,10 @@ int main(int argc, char* argv[])
     {
         images.push_back(reader.readImage(imageName));
     }
-    Harris harris(240);
-    imshow(WINDOW_NAME, harris.getHarrisCorners(images[0]));
-    waitKey(0);
+    //Corner corner(200);
+    //corner.runAll(reader, images[0], "corner");
 
+    Feature feature;
+    reader.saveImage(feature.SURF(images[0], 400), "sift.png");
     return 0;
 }

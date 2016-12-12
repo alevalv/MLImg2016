@@ -6,14 +6,16 @@
 #define MACLEA_HARRIS_H
 
 #include <opencv2/opencv.hpp>
+#include "../imgreader.h"
 
-class Harris
+class Corner
 {
     int threshold;
 public:
-    Harris(int threshold);
+    Corner(int threshold);
     cv::Mat getHarrisCorners(const cv::Mat &image);
-
+    cv::Mat getShiTomasiCorners(const cv::Mat &image);
+    void runAll(ImgReader &reader, const cv::Mat &image, const std::string name);
 };
 
 
