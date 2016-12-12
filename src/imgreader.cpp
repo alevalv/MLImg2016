@@ -51,14 +51,6 @@ vector<string> ImgReader::getAbsoluteUrls(const string folder)
     return imageUrls;
 }
 
-Mat ImgReader::preprocessing(const Mat& image)
-{
-    Mat channels[3];
-    split(image.clone(), channels);
-
-    return channels[1];
-}
-
 Mat ImgReader::readImage(const string url)
 {
     Mat image = imread(url);
@@ -87,4 +79,9 @@ void ImgReader::saveImages(string url, string name, std::vector<Mat>& images, in
         saveImage(current, absoluteFilename);
         currentNumber++;
     }
+}
+
+void ImgReader::setPreprocessing(const std::function<cv::Mat(cv::Mat&)> &function)
+{
+    this->preprocessing = function;
 }

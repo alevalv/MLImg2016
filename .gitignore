@@ -1,4 +1,5 @@
 cmake-*/
 DRIVE/
+cmake-build-debug/
 .idea/
 .directory
