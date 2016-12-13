@@ -51,11 +51,16 @@ vector<string> ImgReader::getAbsoluteUrls(const string folder)
     return imageUrls;
 }
 
-Mat ImgReader::readImage(const string url)
+Mat ImgReader::readImageAbsolute(const string url)
 {
     Mat image = imread(url);
 
     return preprocessing(image);
+}
+
+cv::Mat ImgReader::readImage(const std::string url)
+{
+    return readImageAbsolute(baseurl + url);
 }
 
 void ImgReader::saveImage(Mat image, const string filename)
@@ -84,4 +89,26 @@ void ImgReader::saveImages(string url, string name, std::vector<Mat>& images, in
 void ImgReader::setPreprocessing(const std::function<cv::Mat(cv::Mat&)> &function)
 {
     this->preprocessing = function;
+}
+
+map<int, array<Mat, 2> > ImgReader::readWithGroundTruth(string originalImagePath, string groundTruthPath, string numberDelim)
+{
+    vector<string> imageFilenames = getUrls(originalImagePath);
+    map<int, array<Mat, 2> > images;
+    for (string imageName : imageFilenames)
+    {
+        int id = atoi(imageName.substr(0, imageName.find(numberDelim)).c_str());
+        Mat image = readImage(originalImagePath + imageName);
+        images[id][0] = image;
+    }
+
+    imageFilenames = getUrls(groundTruthPath);
+    for (string imageName : imageFilenames)
+    {
+        int id = atoi(imageName.substr(0, imageName.find(numberDelim)).c_str());
+        Mat image = readImage(groundTruthPath + imageName);
+        images[id][1] = image;
+    }
+
+    return images;
 }

@@ -4,11 +4,10 @@
 
 #include "Feature.h"
 
-#include <opencv2/features2d.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
 
 using namespace cv;
-using namespace cv::xfeatures2d;
 
 Feature::Feature(int minHessian)
 {
@@ -17,7 +16,7 @@ Feature::Feature(int minHessian)
 
 Mat Feature::SURF(Mat &image)
 {
-    Ptr<SURF> detector = SURF::create(minHessian);
+    Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(minHessian);
 
     std::vector<KeyPoint> keypoints1, keypoints2;
 
