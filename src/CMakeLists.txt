@@ -22,7 +22,7 @@ set(core_SRC
     ml/kmeans/KMeans.h
     ml/kmeans/element/Element.cpp
     ml/kmeans/element/Element.h
-        main.cpp preprocessor.h preprocessor.cpp featuredetection/Corner.cpp featuredetection/Corner.h featuredetection/Feature.cpp featuredetection/Feature.h ml/datamaker/DataMaker.cpp ml/datamaker/DataMaker.h ml/svm/svm.cpp ml/svm/svm.h)
+        main.cpp preprocessor.h preprocessor.cpp featuredetection/Corner.cpp featuredetection/Corner.h featuredetection/Feature.cpp featuredetection/Feature.h ml/datamaker/DataMaker.cpp ml/datamaker/DataMaker.h ml/svm/mSVM.cpp ml/svm/mSVM.h)
 
 add_library(core ${core_SRC})
 add_executable(exe main.cpp)

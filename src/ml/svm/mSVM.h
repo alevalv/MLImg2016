@@ -9,12 +9,16 @@
 #include <opencv2/opencv.hpp>
 
 //STATEFUL CLASS
-class svm
+class mSVM
 {
-    cv::Ptr<cv::ml::SVM> mSvm;
     int windowSize;
+    int kernel;
+    cv::Ptr<cv::ml::SVM> mSvm;
 public:
-    void train(std::map<int, std::array<std::vector<cv::Mat>,2> > image, std::string savePath = "");
+    mSVM(int windowSize = 20, int kernel = cv::ml::SVM::LINEAR);
+
+    void train(std::map<int, std::array<std::vector<cv::Mat>, 2> > image, std::string savePath = "");
+
     cv::Mat predict(cv::Mat &image);
 };
 

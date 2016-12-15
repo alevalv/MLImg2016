@@ -27,7 +27,7 @@ void debugInfo(map<int, array<vector<Mat>, 2>> &createdImages)
 
 map<int, array<vector<Mat>, 2>> DataMaker::createData(map<int, array<Mat, 2> > &inputImages)
 {
-    std::map<int, array<vector<Mat>, 2> > createdImages;
+    map<int, array<vector<Mat>, 2> > createdImages;
     for (auto const &item : inputImages)
     {
         Mat oImage = item.second[0];
@@ -83,4 +83,9 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(map<int, array<Mat, 2> > &
     }
     //debugInfo(createdImages);
     return createdImages;
+}
+
+map<int, array<vector<Mat>, 2>>  DataMaker::createData2(map<int, array<Mat, 2> > &inputImages)
+{
+
 }

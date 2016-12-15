@@ -5,14 +5,14 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <random>
 #include <thread>
-#include "svm.h"
+#include "mSVM.h"
 
 
 using namespace std;
 using namespace cv;
 
 
-void svm::train(map<int, array<vector<Mat>, 2> > images, string savePath)
+void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
 {
     int imageCount = 0;
     int imageSize = images[1][0][0].cols * images[1][0][0].rows;
@@ -57,7 +57,7 @@ void svm::train(map<int, array<vector<Mat>, 2> > images, string savePath)
 
     mSvm = ml::SVM::create();
     mSvm->setType(ml::SVM::C_SVC);
-    mSvm->setKernel(ml::SVM::CHI2);
+    mSvm->setKernel(kernel);
     mSvm->setGamma(3);
     mSvm->setDegree(3);
 
@@ -68,6 +68,7 @@ void svm::train(map<int, array<vector<Mat>, 2> > images, string savePath)
         mSvm->save(savePath);
     }
 }
+
 #define WINDOW_NAME "window"
 
 void showImage2(const Mat& image)
@@ -86,7 +87,7 @@ Mat createWindow(Mat &image, int ii, int jj, int halfWS)
             output.at<int>(0, currentColumn++) = image.at<int>(i, j);
     return output;
 }
-Mat svm::predict(cv::Mat &image)
+Mat mSVM::predict(cv::Mat &image)
 {
     int halfWS = windowSize/2;
     Mat outputImage(image.rows, image.cols, CV_8U);
@@ -103,5 +104,11 @@ Mat svm::predict(cv::Mat &image)
         cout << "Finish col:" << i << "\n";
     }
     return outputImage;
+}
+
+mSVM::mSVM(int windowSize, int kernel)
+{
+    this->windowSize = windowSize;
+    this->kernel = kernel;
 }
 
