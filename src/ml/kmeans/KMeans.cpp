@@ -52,6 +52,7 @@ vector<int> KMeans::execute(std::vector<vector<double> > elements)
         oldCentroids = centroids;
         iterations++;
 
+        //estimate which centroid is the closest one to all elements and store it in labels
         double currentDistance = numeric_limits<double>::max();
         for(int i=0; i < elements.size(); i++)
         {
@@ -68,6 +69,7 @@ vector<int> KMeans::execute(std::vector<vector<double> > elements)
             labels[i] = newCentroid;
         }
 
+        //given the new assigned elements to a centroid, recalculate each centroid averaging all elements
         vector<int> count(centroids.size(), 0);
         vector<vector<double> > newCentroids(centroids.size(), vector<double>(centroids[0].size(), 0));
         for(int i=0; i < elements.size(); i++)
@@ -76,6 +78,20 @@ vector<int> KMeans::execute(std::vector<vector<double> > elements)
             for (int j=0; j <elements[i].size(); j++)
             {
                 newCentroids[labels[i]][j]+=elements[i][j];
+            }
+        }
+        for (int i=0; i < count.size(); i++)
+        {
+            if(count[i] > 0)
+            {
+                for(int j=0; j < newCentroids[i].size(); j++)
+                {
+                    newCentroids[i][j]/=count[i];
+                }
+            }
+            else
+            {
+                newCentroids[i] = centroids[i];
             }
         }
 

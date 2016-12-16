@@ -75,6 +75,7 @@ string Util::vectorToString(vector<vector<double> > mVector)
         }
         oss << "]";
     }
+    oss << "\n";
 
     return oss.str();
 }
