@@ -14,7 +14,11 @@ using namespace cv;
 class Preprocessor
 {
 public:
-    static const std::function<Mat(Mat&)> EXTRACT_GREEN;
+    static const function<Mat(Mat &)> NONE;
+    static const function<Mat(Mat &)> EXTRACT_GREEN;
+    static const function<Mat(Mat &)> GRADIENT;
+    static const function<Mat(Mat &)> GRADIENT2;
+    static const function<Mat(Mat &)> GREEN_DUAL_GRADIENT;
 };
 
 #endif //MACLEA_PREPROCESS_H

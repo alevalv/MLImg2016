@@ -35,21 +35,21 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(map<int, array<Mat, 2> > &
         int halfWS = windowSize / 2;
         int currentImageCountYes = 0;
         int currentImageCountNo = 0;
-        for (int i = windowSize; i < (oImage.cols - windowSize); i++)
+        for (int y = windowSize; y < (oImage.rows - windowSize); y++)
         {
-            for (int j = windowSize; j < (oImage.rows - windowSize); j++)
+            for (int x = windowSize; x < (oImage.cols - windowSize); x++)
             {
-                if (currentImageCountYes < maxCountImages && oImage.at<int>(j, i) > threshold &&
-                    gtImage.at<int>(i, j) > threshold)
+                if (currentImageCountYes < maxCountImages && oImage.at<int>(y, x) > threshold &&
+                    gtImage.at<int>(y, x) > threshold)
                 {
-                    Rect roi(i - halfWS, j - halfWS, windowSize, windowSize);
+                    Rect roi(y - halfWS, x - halfWS, windowSize, windowSize);
                     createdImages[item.first][0].push_back(oImage(roi));
                     currentImageCountYes++;
                 }
-                if (currentImageCountNo < (maxCountImages * 8) && oImage.at<int>(j, i) > threshold &&
-                    gtImage.at<int>(i, j) < threshold)
+                if (currentImageCountNo < (maxCountImages * 8) && oImage.at<int>(y, x) > threshold &&
+                    gtImage.at<int>(y, x) < threshold)
                 {
-                    Rect roi(i - halfWS, j - halfWS, windowSize, windowSize);
+                    Rect roi(y - halfWS, x - halfWS, windowSize, windowSize);
                     createdImages[item.first][1].push_back(oImage(roi));
                     currentImageCountNo++;
                 }

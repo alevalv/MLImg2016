@@ -39,13 +39,15 @@ void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
         {
             long randomImage = random() % item.second[0].size();
             int currentColumn = 0;
-            for (int i = 0; i < item.second[0][randomImage].rows; i++)
-                for (int j = 0; j < item.second[0][randomImage].cols; j++)
+            for (int y = 0; y < item.second[0][randomImage].rows; y++)
+            {
+                for (int x = 0; x < item.second[0][randomImage].cols; x++)
                 {
-                    trainingData.at<int>(currentImage, currentColumn) = item.second[0][randomImage].at<int>(i, j);
-                    trainingData.at<int>(currentImage + 1, currentColumn) = item.second[1][randomImage].at<int>(i, j);
+                    trainingData.at<int>(currentImage, currentColumn) = item.second[0][randomImage].at<int>(y, x);
+                    trainingData.at<int>(currentImage + 1, currentColumn) = item.second[1][randomImage].at<int>(y, x);
                     currentColumn++;
                 }
+            }
             currentImage += 2;
         }
     }
@@ -78,30 +80,30 @@ void showImage2(const Mat& image)
     waitKey(0);
 }
 
-Mat createWindow(Mat &image, int ii, int jj, int halfWS)
+Mat createWindow(Mat &image, int yy, int xx, int halfWS)
 {
     Mat output(1, (halfWS*2) * (halfWS*2), CV_32F);
     int currentColumn = 0;
-    for (int i = ii-halfWS; i < ii + halfWS; i++)
-        for (int j = jj - halfWS; j < jj + halfWS; j++)
-            output.at<int>(0, currentColumn++) = image.at<int>(i, j);
+    for (int y = yy-halfWS; y < yy + halfWS; y++)
+        for (int x = xx - halfWS; x < xx + halfWS; x++)
+            output.at<int>(0, currentColumn++) = image.at<int>(y, x);
     return output;
 }
 Mat mSVM::predict(cv::Mat &image)
 {
     int halfWS = windowSize/2;
-    Mat outputImage(image.rows, image.cols, CV_8U);
+    Mat outputImage(image.rows, image.cols, CV_8U, 0.0);
     cout<<"Evaluating "<<image.rows*image.cols<<" pixels\n";
-    for (int i = windowSize; i < (image.cols - windowSize); i++)
+    for (int y = windowSize; y < (image.rows - windowSize); y++)
     {
-        for (int j = windowSize; j < (image.rows - windowSize); j++)
+        for (int x = windowSize; x < (image.cols - windowSize); x++)
         {
-            Mat image = createWindow(image, i, j, halfWS);
+            Mat image = createWindow(image, y, x, halfWS);
             float response = mSvm->predict(image);
             if (response == 1)
-                outputImage.at<float>(i, j) = 255;
+                outputImage.at<float>(y, x) = 255;
         }
-        cout << "Finish col:" << i << "\n";
+        cout << "Finish row:" << y << "\n";
     }
     return outputImage;
 }

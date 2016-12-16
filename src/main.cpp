@@ -24,7 +24,7 @@ void showImage(const Mat& image)
     waitKey(0);
 }
 
-static const char *optString = "cfsk:w:i:d:o:g:t:h?";
+static const char *optString = "cfsk:w:i:d:o:g:t:!:h?";
 
 static const struct option longOpts[] =
     {
@@ -43,11 +43,12 @@ static const struct option longOpts[] =
 
 int main(int argc, char* argv[])
 {
+    bool testing = false;
     int option = 0;
     int corner = 0, feature = 0, use_svm = 0, kernel = -1, window_size = 30, image_count = 5000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
-    if (argc < 3)
+    if (argc < 2)
     {
         cout<<USAGE;
         exit(EXIT_FAILURE);
@@ -83,6 +84,8 @@ int main(int argc, char* argv[])
             case 'g':
                 ground_truth_dir = string(optarg);
                 break;
+            case '!':
+                testing = true;
             case 't':
                 target_image_path = string(optarg);
                 break;
@@ -99,7 +102,14 @@ int main(int argc, char* argv[])
     ImgReader reader = ImgReader(image_dir);
     reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
 
-    if (corner || feature)
+    if (testing)
+    {
+        Mat image = reader.readImageAbsolute(target_image_path);
+        showImage(image);
+        Mat output = Preprocessor::GREEN_DUAL_GRADIENT(image);
+        showImage(output);
+    }
+    else if (corner || feature)
     {
         vector<string> imageFilenames = reader.getAbsoluteUrls(source_images_dir);
         vector<Mat> images;

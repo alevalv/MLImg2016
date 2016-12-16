@@ -5,14 +5,12 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include <functional>
+#include "preprocessor.h"
 
 class ImgReader
 {
     std::string baseurl;
-    std::function<cv::Mat(cv::Mat&)> preprocessing = [] (cv::Mat &image) -> cv::Mat
-    {
-        return image;
-    };
+    std::function<cv::Mat(cv::Mat&)> preprocessing = Preprocessor::NONE;
 public:
     ImgReader(const std::string baseUrl);
     std::vector<std::string> getUrls(const std::string folder);
