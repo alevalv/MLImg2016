@@ -41,13 +41,13 @@ void KMeans::execute(Mat image)
 
 }
 
-void KMeans::execute(std::vector<vector<double> > elements)
+vector<int> KMeans::execute(std::vector<vector<double> > elements)
 {
     int iterations = 0;
     vector<vector<double> > oldCentroids;
     vector<int> labels(elements.size(), -1);
 
-    while(Util::distance(oldCentroids, centroids) != 0 && iterations < 1000)
+    do
     {
         oldCentroids = centroids;
         iterations++;
@@ -58,7 +58,7 @@ void KMeans::execute(std::vector<vector<double> > elements)
             int newCentroid = -1;
             for (int j=0; j < centroids.size(); j++)
             {
-                double centroidDistance = Util::distance(elements[i], centroids[j]);
+                double centroidDistance = Util::euclideanDistance(elements[i], centroids[j]);
                 if (centroidDistance < currentDistance)
                 {
                     currentDistance = centroidDistance;
@@ -81,10 +81,12 @@ void KMeans::execute(std::vector<vector<double> > elements)
 
         centroids = newCentroids;
     }
+    while(Util::distance(oldCentroids, centroids, Util::manhattanDistance) > epsilon && iterations < 1000);
 
+    return labels;
 }
 
-std::vector<std::vector<double> > KMeans::getCentroids()
+vector<vector<double> > KMeans::getCentroids()
 {
     return centroids;
 }

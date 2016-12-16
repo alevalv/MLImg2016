@@ -107,8 +107,9 @@ int main(int argc, char* argv[])
     if (testing)
     {
         KMeans kmeans(4, 2, 500);
-        kmeans.execute(vector<vector<double> >{vector<double>{1,1}});
+        vector<int> tags = kmeans.execute(vector<vector<double> >{vector<double>{20,20}});
         cout<<Util::vectorToString(kmeans.getCentroids());
+        cout<<tags[0]<<endl;
     }
     else if (corner || feature)
     {
