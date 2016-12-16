@@ -5,27 +5,17 @@
 #ifndef MACLEA_KMEANS_H
 #define MACLEA_KMEANS_H
 
-#include <vector>
 #include <opencv2/core/mat.hpp>
 #include <functional>
 #include <cv.hpp>
-#include "element/Element.h"
 
 class KMeans {
-    std::function<cv::Mat(cv::Mat)> preprocess = [] (cv::Mat image) -> cv::Mat
-    {
-        cv::Mat sobel;
-        cv::Sobel(image, sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-
-
-        return sobel;
-    };
-    std::vector<Element> centroids;
-    cv::Mat elementMatrix;
+    std::vector<std::vector<double> > centroids;
 public:
-    KMeans(int centroids);
-    KMeans(std::vector<Element> centroids);
+    KMeans(int centroidCount, int elementSize, int maxValue);
+    KMeans(std::vector<std::vector<double> > centroids);
     void execute(cv::Mat image);
-    void setPreprocessing(std::function<cv::Mat(cv::Mat)> &function);
+    void execute(std::vector<std::vector<double> > elements);
+    std::vector<std::vector<double> > getCentroids();
 };
 #endif //MACLEA_KMEANS_H

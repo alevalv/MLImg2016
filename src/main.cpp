@@ -9,6 +9,8 @@
 #include "featuredetection/Feature.h"
 #include "ml/datamaker/DataMaker.h"
 #include "ml/svm/mSVM.h"
+#include "ml/kmeans/KMeans.h"
+#include "util.h"
 
 using namespace std;
 using namespace cv;
@@ -104,10 +106,9 @@ int main(int argc, char* argv[])
 
     if (testing)
     {
-        Mat image = reader.readImageAbsolute(target_image_path);
-        showImage(image);
-        Mat output = Preprocessor::GREEN_DUAL_GRADIENT(image);
-        showImage(output);
+        KMeans kmeans(4, 2, 500);
+        kmeans.execute(vector<vector<double> >{vector<double>{1,1}});
+        cout<<Util::vectorToString(kmeans.getCentroids());
     }
     else if (corner || feature)
     {
@@ -136,6 +137,7 @@ int main(int argc, char* argv[])
             cout<<"-o and -g are mandatory for -s\n";
             exit(EXIT_FAILURE);
         }
+        reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
         DataMaker maker(image_count, 100);
         map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
         mSVM mSvm(window_size, kernel);

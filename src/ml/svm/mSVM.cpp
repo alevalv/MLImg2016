@@ -4,13 +4,11 @@
 
 #include <opencv2/xfeatures2d.hpp>
 #include <random>
-#include <thread>
 #include "mSVM.h"
 
 
 using namespace std;
 using namespace cv;
-
 
 void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
 {
