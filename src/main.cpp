@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <libltdl/lt_system.h>
-#include "imgreader.h"
-#include "preprocessor.h"
+#include "image/imgreader.h"
+#include "image/preprocessor.h"
 #include "featuredetection/Corner.h"
 #include "featuredetection/Feature.h"
 #include "ml/datamaker/DataMaker.h"
@@ -40,14 +40,15 @@ static const struct option longOpts[] =
         {"image-directory", required_argument, NULL, 'd'},
         {"sourcei-directory", required_argument, NULL, 'o'},
         {"groundt-directory", required_argument, NULL, 'g'},
-        {"target-image", required_argument, NULL, 't'}
+        {"target-image", required_argument, NULL, 't'},
+        {"k-means", no_argument, NULL, '0'}
     };
 
 int main(int argc, char* argv[])
 {
     bool testing = false;
     int option = 0;
-    int corner = 0, feature = 0, use_svm = 0, kernel = -1, window_size = 30, image_count = 5000;
+    int corner = 0, feature = 0, use_svm = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
     if (argc < 2)
@@ -91,6 +92,9 @@ int main(int argc, char* argv[])
             case 't':
                 target_image_path = string(optarg);
                 break;
+            case '0':
+                use_kmeans = 1;
+                break;
             case 'h':
             case '?':
             default:
@@ -118,7 +122,6 @@ int main(int argc, char* argv[])
         initialCentroids[2][1] = image.cols/2.0;
         cout<<Util::vectorToString(initialCentroids);
         KMeans kmeans(initialCentroids);
-        cout<<"Executing KMeans\n";
         vector<int> tags = kmeans.execute(corners);
         cout<<Util::vectorToString(kmeans.getCentroids());
         cout<<Util::vectorToString(tags)<<endl;

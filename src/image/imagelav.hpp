@@ -3,7 +3,7 @@
 
 #include "imagemaker.h"
 #include "imgreader.h"
-#include "retinalimage.h"
-#include "util.h"
+#include "../retina/retinalimage.h"
+#include "../util.h"
 
 #endif // IMAGELAV_H

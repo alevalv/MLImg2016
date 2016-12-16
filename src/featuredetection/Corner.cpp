@@ -3,7 +3,7 @@
 //
 
 #include "Corner.h"
-#include "../imgreader.h"
+#include "../image/imgreader.h"
 
 using namespace std;
 using namespace cv;

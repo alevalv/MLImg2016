@@ -1,7 +1,7 @@
 #include <dirent.h>
 #include <iostream>
 #include "imgreader.h"
-#include "util.h"
+#include "../util.h"
 
 using namespace cv;
 using namespace std;

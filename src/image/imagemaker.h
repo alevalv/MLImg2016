@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "retinalimage.h"
+#include "../retina/retinalimage.h"
 
 class ImageMaker
 {

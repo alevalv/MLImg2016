@@ -7,20 +7,30 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(core_SRC
-    imagelav.hpp
-    imagemaker.cpp
-    imagemaker.h
-    imgreader.cpp
-    imgreader.h
-    retinalimage.cpp
-    retinalimage.h
-    svm.cpp
+    image/imagelav.hpp
+    image/imagemaker.cpp
+    image/imagemaker.h
+    image/imgreader.cpp
+    image/imgreader.h
+    image/preprocessor.h
+    image/preprocessor.cpp
+    retina/retinalimage.cpp
+    retina/retinalimage.h
+    featuredetection/Corner.cpp
+    featuredetection/Corner.h
+    featuredetection/Feature.cpp
+    featuredetection/Feature.h
+    ml/kmeans/KMeans.cpp
+    ml/kmeans/KMeans.h
+    ml/datamaker/DataMaker.cpp
+    ml/datamaker/DataMaker.h
+    ml/svm/mSVM.cpp
+    ml/svm/mSVM.h
+    ml/knearest/KNearest.cpp
+    ml/knearest/KNearest.h
     util.cpp
     util.h
-    vessel_extraction.cpp
-        ml/kmeans/KMeans.cpp
-    ml/kmeans/KMeans.h
-        main.cpp preprocessor.h preprocessor.cpp featuredetection/Corner.cpp featuredetection/Corner.h featuredetection/Feature.cpp featuredetection/Feature.h ml/datamaker/DataMaker.cpp ml/datamaker/DataMaker.h ml/svm/mSVM.cpp ml/svm/mSVM.h ml/knearest/KNearest.cpp ml/knearest/KNearest.h)
+    main.cpp)
 
 add_library(core ${core_SRC})
 add_executable(exe main.cpp)

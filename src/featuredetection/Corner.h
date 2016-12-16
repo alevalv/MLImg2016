@@ -6,7 +6,7 @@
 #define MACLEA_HARRIS_H
 
 #include <opencv2/opencv.hpp>
-#include "../imgreader.h"
+#include "../image/imgreader.h"
 
 class Corner
 {
