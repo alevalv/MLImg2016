@@ -106,10 +106,22 @@ int main(int argc, char* argv[])
 
     if (testing)
     {
-        KMeans kmeans(4, 2, 500);
-        vector<int> tags = kmeans.execute(vector<vector<double> >{vector<double>{20,20}});
+        Mat image = reader.readImageAbsolute(target_image_path);
+        Corner corner(200);
+        vector<vector<double> > corners = corner.shiTomasiGetCorners(image);
+        cout<<"Corners: "<<Util::vectorToString(corners);
+        vector<vector<double> > initialCentroids(3, vector<double>(2, 0));
+        initialCentroids[0][0] = image.rows/2.0;
+        initialCentroids[1][0] = image.rows;
+        initialCentroids[1][1] = image.cols/2.0;
+        initialCentroids[2][0] = image.rows/2.0;
+        initialCentroids[2][1] = image.cols/2.0;
+        cout<<Util::vectorToString(initialCentroids);
+        KMeans kmeans(initialCentroids);
+        cout<<"Executing KMeans\n";
+        vector<int> tags = kmeans.execute(corners);
         cout<<Util::vectorToString(kmeans.getCentroids());
-        cout<<tags[0]<<endl;
+        cout<<Util::vectorToString(tags)<<endl;
     }
     else if (corner || feature)
     {
@@ -127,7 +139,7 @@ int main(int argc, char* argv[])
         else
         {
             Feature feature(400);
-            Mat image = feature.SURF(images[0]);
+            Mat image = feature.SURFDrawImage(images[0]);
             reader.saveImage(image, "surf.png");
         }
     }

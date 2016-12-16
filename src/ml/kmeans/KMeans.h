@@ -13,6 +13,7 @@ class KMeans {
     std::vector<std::vector<double> > centroids;
 public:
     double epsilon = 0.001;
+    double maxIterations = 1000;
     KMeans(int centroidCount, int elementSize, int maxValue);
     KMeans(std::vector<std::vector<double> > centroids);
     void execute(cv::Mat image);

@@ -13,8 +13,15 @@ class Corner
     int threshold;
 public:
     Corner(int threshold);
-    cv::Mat getHarrisCorners(const cv::Mat &image);
-    cv::Mat getShiTomasiCorners(const cv::Mat &image);
+
+    cv::Mat harrisDrawImage(const cv::Mat &image);
+
+    std::vector<std::vector<double> > harrisGetCorners(const cv::Mat &image);
+
+    cv::Mat shiTomasiDrawImage(const cv::Mat &image);
+
+    std::vector<std::vector<double> > shiTomasiGetCorners(const cv::Mat &image);
+
     void runAll(ImgReader &reader, const cv::Mat &image, const std::string name);
 };
 

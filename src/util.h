@@ -12,7 +12,10 @@ public:
                            std::vector<std::vector<double> > &element2,
                            std::function<double(std::vector<double> &, std::vector<double> &)> fun);
     static double manhattanDistance(std::vector<double> &element1, std::vector<double> &element2);
+
+
     static std::string vectorToString(std::vector<std::vector<double> > mVector);
+    static std::string vectorToString(std::vector<int> mVector);
 };
 
 #endif // UTIL_H

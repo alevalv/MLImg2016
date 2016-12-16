@@ -8,22 +8,44 @@
 #include <opencv2/xfeatures2d.hpp>
 
 using namespace cv;
+using namespace std;
 
 Feature::Feature(int minHessian)
 {
     this->minHessian = minHessian;
 }
 
-Mat Feature::SURF(Mat &image)
+Mat Feature::SURFDrawImage(Mat &image)
 {
     Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(minHessian);
 
-    std::vector<KeyPoint> keypoints1, keypoints2;
+    vector<KeyPoint> keypoints;
 
-    detector->detect(image, keypoints1);
+    detector->detect(image, keypoints);
 
     Mat drawImage;
-    drawKeypoints(image, keypoints1, drawImage, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+    drawKeypoints(image, keypoints, drawImage, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 
     return drawImage;
+}
+
+vector<vector<double> > Feature::SURF(cv::Mat &image)
+{
+    Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(minHessian);
+
+    vector<KeyPoint> keypoints;
+
+    detector->detect(image, keypoints);
+
+    vector<vector<double> > output;
+
+    for (auto& keypoint : keypoints)
+    {
+        vector<double> point(2, 0.0);
+        point[0] = keypoint.pt.x;
+        point[1] = keypoint.pt.y;
+        output.push_back(point);
+    }
+
+    return output;
 }

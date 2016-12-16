@@ -69,13 +69,29 @@ string Util::vectorToString(vector<vector<double> > mVector)
         if (!cVector.empty())
         {
             copy(cVector.begin(), cVector.end() - 1,
-                      ostream_iterator<double>(oss, ","));
+                 ostream_iterator<double>(oss, ","));
 
             oss << cVector.back();
         }
         oss << "]";
     }
     oss << "\n";
+
+    return oss.str();
+}
+
+string Util::vectorToString(vector<int> mVector)
+{
+    ostringstream oss;
+    oss << "[";
+    if (!mVector.empty())
+    {
+        copy(mVector.begin(), mVector.end() - 1,
+             ostream_iterator<int>(oss, ","));
+
+        oss << mVector.back();
+    }
+    oss << "]";
 
     return oss.str();
 }
