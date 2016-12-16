@@ -41,6 +41,29 @@ void KMeans::execute(Mat image)
 
 }
 
+vector<double> KMeans::findBiggestCentroid(vector<int> labels, vector<vector<double> > centroids)
+{
+    vector<int> count(labels.size(), 0);
+
+    for (auto& label : labels)
+    {
+        count[label]++;
+    }
+
+    int cCentroid = -1;
+    int cCount = -1;
+    for (int i = 0; i < count.size(); i++)
+    {
+        if (count[i] > cCount)
+        {
+            cCount = count[i];
+            cCentroid = i;
+        }
+    }
+
+    return centroids[cCentroid];
+}
+
 vector<int> KMeans::execute(std::vector<vector<double> > elements)
 {
     int iterations = 0;

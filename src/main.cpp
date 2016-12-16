@@ -9,13 +9,13 @@
 #include "featuredetection/Feature.h"
 #include "ml/datamaker/DataMaker.h"
 #include "ml/svm/mSVM.h"
-#include "ml/kmeans/KMeans.h"
 #include "util.h"
+#include "retina/RetinaUtils.h"
+#include "../lib/prettyprint.hpp"
 
 using namespace std;
 using namespace cv;
 
-#define IMAGE_DIR "../../DRIVE/"
 #define WINDOW_NAME "window"
 #define USAGE "maclea -c -f -s -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
 
@@ -111,20 +111,9 @@ int main(int argc, char* argv[])
     if (testing)
     {
         Mat image = reader.readImageAbsolute(target_image_path);
-        Corner corner(200);
-        vector<vector<double> > corners = corner.shiTomasiGetCorners(image);
-        cout<<"Corners: "<<Util::vectorToString(corners);
-        vector<vector<double> > initialCentroids(3, vector<double>(2, 0));
-        initialCentroids[0][0] = image.rows/2.0;
-        initialCentroids[1][0] = image.rows;
-        initialCentroids[1][1] = image.cols/2.0;
-        initialCentroids[2][0] = image.rows/2.0;
-        initialCentroids[2][1] = image.cols/2.0;
-        cout<<Util::vectorToString(initialCentroids);
-        KMeans kmeans(initialCentroids);
-        vector<int> tags = kmeans.execute(corners);
-        cout<<Util::vectorToString(kmeans.getCentroids());
-        cout<<Util::vectorToString(tags)<<endl;
+        vector<double> od = RetinaUtils::findOpticalDisk(image);
+
+        cout<<od;
     }
     else if (corner || feature)
     {

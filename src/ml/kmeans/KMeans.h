@@ -12,8 +12,12 @@
 class KMeans {
     std::vector<std::vector<double> > centroids;
 public:
+    static std::vector<double> findBiggestCentroid(std::vector<int> labels, std::vector<std::vector<double> > centroids);
+
     double epsilon = 0.001;
     double maxIterations = 1000;
+
+
     KMeans(int centroidCount, int elementSize, int maxValue);
     KMeans(std::vector<std::vector<double> > centroids);
     void execute(cv::Mat image);

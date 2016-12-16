@@ -7,6 +7,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(core_SRC
+    ../lib/prettyprint.hpp
     image/imagelav.hpp
     image/imagemaker.cpp
     image/imagemaker.h
@@ -16,6 +17,8 @@ set(core_SRC
     image/preprocessor.cpp
     retina/retinalimage.cpp
     retina/retinalimage.h
+    retina/RetinaUtils.cpp
+    retina/RetinaUtils.h
     featuredetection/Corner.cpp
     featuredetection/Corner.h
     featuredetection/Feature.cpp
