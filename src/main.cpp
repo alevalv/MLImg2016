@@ -133,20 +133,16 @@ int main(int argc, char* argv[])
             cout<<"-o and -g are mandatory for -s\n";
             exit(EXIT_FAILURE);
         }
-        reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
+        reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
         DataMaker maker(image_count, 100);
         map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
         mSVM mSvm(window_size, kernel);
         mSvm.train(maker.createData(images));
         Mat image = reader.readImageAbsolute(target_image_path); // /home/alevalv/Maestria/MacLea/SourceCode/DRIVE/training/images/21_training.tif
         Mat seg = mSvm.predict(image);
-        string outputfile = "svm";
-        outputfile.append(""+kernel);
-        outputfile.append("-");
-        outputfile.append(""+window_size);
-        outputfile.append(".png");
+        string outputFile = "svm" + to_string(kernel) + "-" + to_string(window_size) + ".png";
 
-        reader.saveImage(seg, outputfile);
+        reader.saveImage(seg, outputFile);
     }
     return 0;
 }

@@ -25,6 +25,10 @@ void debugInfo(map<int, array<vector<Mat>, 2>> &createdImages)
     }
 }
 
+/**
+ * this method creates a set of windows for all given images, sorting them in two groups, one that in the center has
+ * a pixel that is a vein and one that does not.
+ */
 map<int, array<vector<Mat>, 2>> DataMaker::createData(map<int, array<Mat, 2> > &inputImages)
 {
     map<int, array<vector<Mat>, 2> > createdImages;
@@ -42,7 +46,7 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(map<int, array<Mat, 2> > &
                 if (currentImageCountYes < maxCountImages && oImage.at<int>(y, x) > threshold &&
                     gtImage.at<int>(y, x) > threshold)
                 {
-                    Rect roi(y - halfWS, x - halfWS, windowSize, windowSize);
+                    Rect roi(x - halfWS, y - halfWS, windowSize, windowSize);
                     createdImages[item.first][0].push_back(oImage(roi));
                     currentImageCountYes++;
                 }

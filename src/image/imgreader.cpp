@@ -63,6 +63,16 @@ cv::Mat ImgReader::readImage(const std::string url)
     return readImageAbsolute(baseurl + url);
 }
 
+Mat ImgReader::readImageAbsoluteNoPreprocessing(const string url)
+{
+    return imread(url);
+}
+
+cv::Mat ImgReader::readImageNoPreprocessing(const std::string url)
+{
+    return readImageAbsoluteNoPreprocessing(baseurl + url);
+}
+
 void ImgReader::saveImage(Mat image, const string filename)
 {
     imwrite(filename, image);
@@ -106,7 +116,7 @@ map<int, array<Mat, 2> > ImgReader::readWithGroundTruth(string originalImagePath
     for (string imageName : imageFilenames)
     {
         int id = atoi(imageName.substr(0, imageName.find(numberDelim)).c_str());
-        Mat image = readImage(groundTruthPath + imageName);
+        Mat image = readImageNoPreprocessing(groundTruthPath + imageName);
         images[id][1] = image;
     }
 

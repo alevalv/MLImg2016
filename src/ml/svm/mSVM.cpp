@@ -69,15 +69,6 @@ void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
     }
 }
 
-#define WINDOW_NAME "window"
-
-void showImage2(const Mat& image)
-{
-    namedWindow(WINDOW_NAME, WINDOW_FREERATIO);
-    imshow(WINDOW_NAME, image);
-    waitKey(0);
-}
-
 Mat createWindow(Mat &image, int yy, int xx, int halfWS)
 {
     Mat output(1, (halfWS*2) * (halfWS*2), CV_32F);
