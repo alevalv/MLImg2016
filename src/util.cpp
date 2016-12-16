@@ -1,9 +1,12 @@
 #include <sstream>
-#include <iterator>
 #include <functional>
+#include <cv.hpp>
 #include "util.h"
 
 using namespace std;
+using namespace cv;
+
+const string Util::WINDOW_NAME = "window";
 
 int Util::countDigits(const int number)
 {
@@ -57,4 +60,45 @@ double Util::distance(vector<vector<double> > &element1,
     }
 
     return distance;
+}
+
+void Util::showImage(const Mat& image)
+{
+    namedWindow(WINDOW_NAME, WINDOW_FREERATIO);
+    imshow(WINDOW_NAME, image);
+    waitKey(0);
+}
+
+//See https://en.wikipedia.org/wiki/Midpoint_circle_algorithm#C_EXAMPLE
+vector<Point2d> Util::getCircle(int x0, int y0, int radius)
+{
+    vector<Point2d> points;
+    int x = radius;
+    int y = 0;
+    int err = 0;
+
+    while (x >= y)
+    {
+        points.push_back(Point2d(x0 + x, y0 + y));
+        points.push_back(Point2d(x0 + y, y0 + x));
+        points.push_back(Point2d(x0 - y, y0 + x));
+        points.push_back(Point2d(x0 - x, y0 + y));
+        points.push_back(Point2d(x0 - x, y0 - y));
+        points.push_back(Point2d(x0 - y, y0 - x));
+        points.push_back(Point2d(x0 + y, y0 - x));
+        points.push_back(Point2d(x0 + x, y0 - y));
+
+        if (err <= 0)
+        {
+            y += 1;
+            err += 2*y + 1;
+        }
+        if (err > 0)
+        {
+            x -= 1;
+            err -= 2*x + 1;
+        }
+    }
+
+    return points;
 }

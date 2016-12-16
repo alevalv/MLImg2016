@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
-#include <libltdl/lt_system.h>
 #include "image/imgreader.h"
 #include "image/preprocessor.h"
 #include "featuredetection/Corner.h"
@@ -16,15 +15,7 @@
 using namespace std;
 using namespace cv;
 
-#define WINDOW_NAME "window"
 #define USAGE "maclea -c -f -s -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
-
-void showImage(const Mat& image)
-{
-    namedWindow(WINDOW_NAME, WINDOW_FREERATIO);
-    imshow(WINDOW_NAME, image);
-    waitKey(0);
-}
 
 static const char *optString = "cfsk:w:i:d:o:g:t:!:h?";
 
@@ -113,7 +104,7 @@ int main(int argc, char* argv[])
         Mat image = reader.readImageAbsolute(target_image_path);
         vector<double> od = RetinaUtils::findOpticalDisk(image);
 
-        cout<<od;
+        cout<<Util::getCircle(od[0], od[1], 10);
     }
     else if (corner || feature)
     {

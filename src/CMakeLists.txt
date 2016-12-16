@@ -8,9 +8,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(core_SRC
     ../lib/prettyprint.hpp
-    image/imagelav.hpp
-    image/imagemaker.cpp
-    image/imagemaker.h
     image/imgreader.cpp
     image/imgreader.h
     image/preprocessor.h
