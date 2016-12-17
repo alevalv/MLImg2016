@@ -7,6 +7,7 @@
 #include "mSVM.h"
 #include "../../retina/RetinaUtils.h"
 #include "../../util.h"
+#include "../../../lib/prettyprint.hpp"
 
 
 using namespace std;
@@ -74,40 +75,56 @@ void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
 //original image should have three channels, 1st with original green, 2nd with first gradient and 3rd with second gradient
 void mSVM::train2(map<int, array<Mat, 2> > images, string savePath)
 {
-    Mat channels[3];
-    split(images[1][0], channels);
 
-    vector<double> opticalDisk = RetinaUtils::findOpticalDisk(channels[0]);
-
-    vector<Point2d> points;
-    for (int i=10; i <=40; i+=10)
+    vector<Mat> trainingDataVector;
+    vector<Mat> labelsVector;
+    Mat trainingData;
+    Mat labels;
+    for (auto& item : images)
     {
-        vector<Point2d> tmpPoints = Util::getCircle(opticalDisk[0], opticalDisk[1], i);
-        points.insert(std::end(points), std::begin(tmpPoints), std::end(tmpPoints));
-    }
+        Mat channels[3];
+        split(item.second[0], channels);
 
-    Mat trainingData(points.size(), 5, CV_32F, 0.0);
-    Mat labels(points.size(), 1, CV_32SC1, 0.0);
+        vector<double> opticalDisk = RetinaUtils::findOpticalDisk(channels[0]);
+        //Util::showImage(RetinaUtils::drawOpticalDiskLocation(opticalDisk, channels[0]));
+        //cout<<item.first<<" "<<opticalDisk<<endl;
 
-    int currentTD = 0;
-    for (auto& point : points)
-    {
-        trainingData.at<float>(currentTD, 0) = channels[0].at<int>(point.x, point.y);
-        trainingData.at<float>(currentTD, 1) = channels[1].at<int>(point.x, point.y);
-        trainingData.at<float>(currentTD, 2) = channels[2].at<int>(point.x, point.y);
-        trainingData.at<float>(currentTD, 3) = point.x;
-        trainingData.at<float>(currentTD, 4) = point.y;
-
-        if (images[1][1].at<int>(point.x, point.y) > 50)
+        vector<Point2d> points;
+        for (int i=12; i <=15; i+=1)
         {
-            labels.at<int>(currentTD, 0) = 1;
+            vector<Point2d> tmpPoints = Util::getCircle((int)opticalDisk[0], (int)opticalDisk[1], i, channels[0].rows, channels[0].cols);
+            points.insert(std::end(points), std::begin(tmpPoints), std::end(tmpPoints));
         }
-        currentTD++;
+
+        Mat tmpTrainingData(points.size(), 5, CV_32F, 0.0);
+        Mat tmpLabels(points.size(), 1, CV_32SC1, 0.0);
+        int currentTD = 0;
+
+        for (auto& point : points)
+        {
+            tmpTrainingData.at<float>(currentTD, 0) = channels[0].at<float>(point.x, point.y);
+            tmpTrainingData.at<float>(currentTD, 1) = channels[1].at<float>(point.x, point.y);
+            tmpTrainingData.at<float>(currentTD, 2) = channels[2].at<float>(point.x, point.y);
+            tmpTrainingData.at<float>(currentTD, 3) = point.x;
+            tmpTrainingData.at<float>(currentTD, 4) = point.y;
+
+            if (images[1][1].at<int>(point.x, point.y) > 50)
+            {
+                tmpLabels.at<int>(currentTD, 0) = 1;
+            }
+            else
+            {
+                tmpLabels.at<int>(currentTD, 0) = 0;
+            }
+            currentTD++;
+        }
+        vconcat(tmpTrainingData, trainingData);
+        vconcat(tmpLabels, labels);
     }
 
     mSvm = ml::SVM::create();
     mSvm->setType(ml::SVM::C_SVC);
-    mSvm->setKernel(ml::SVM::POLY);
+    mSvm->setKernel(kernel);
     mSvm->setGamma(3);
     mSvm->setDegree(3);
 
@@ -156,15 +173,14 @@ Mat mSVM::predict2(cv::Mat &image)
             currentpix.at<float>(0, 0) = channels[0].at<float>(y, x);
             currentpix.at<float>(0, 1) = channels[1].at<float>(y, x);
             currentpix.at<float>(0, 2) = channels[2].at<float>(y, x);
-            currentpix.at<float>(0, 3) = y;
-            currentpix.at<float>(0, 4) = x;
+            currentpix.at<float>(0, 3) = x;
+            currentpix.at<float>(0, 4) = y;
 
             float response = mSvm->predict(currentpix);
             if (response == 1)
                 outputImage.at<float>(y, x) = 1;
         }
     }
-    cout<<"kha"<<endl;
     return outputImage;
 }
 

@@ -16,7 +16,7 @@ public:
                            std::function<double(std::vector<double> &, std::vector<double> &)> fun);
     static double manhattanDistance(std::vector<double> &element1, std::vector<double> &element2);
     static void showImage(const cv::Mat& image);
-    static std::vector<cv::Point2d> getCircle(int x, int y, int radius);
+    static std::vector<cv::Point2d> getCircle(int x, int y, int radius, int yy, int xx);
 
 };
 

@@ -70,7 +70,7 @@ void Util::showImage(const Mat& image)
 }
 
 //See https://en.wikipedia.org/wiki/Midpoint_circle_algorithm#C_EXAMPLE
-vector<Point2d> Util::getCircle(int x0, int y0, int radius)
+vector<Point2d> Util::getCircle(int x0, int y0, int radius, int yy, int xx)
 {
     vector<Point2d> points;
     int x = radius;
@@ -79,14 +79,14 @@ vector<Point2d> Util::getCircle(int x0, int y0, int radius)
 
     while (x >= y)
     {
-        points.push_back(Point2d(x0 + x, y0 + y));
-        points.push_back(Point2d(x0 + y, y0 + x));
-        points.push_back(Point2d(x0 - y, y0 + x));
-        points.push_back(Point2d(x0 - x, y0 + y));
-        points.push_back(Point2d(x0 - x, y0 - y));
-        points.push_back(Point2d(x0 - y, y0 - x));
-        points.push_back(Point2d(x0 + y, y0 - x));
-        points.push_back(Point2d(x0 + x, y0 - y));
+        points.push_back(Point2d((x0 + x)%xx, (y0 + y)%yy));
+        points.push_back(Point2d((x0 + y)%xx, (y0 + x)%yy));
+        points.push_back(Point2d((x0 - y)%xx, (y0 + x)%yy));
+        points.push_back(Point2d((x0 - x)%xx, (y0 + y)%yy));
+        points.push_back(Point2d((x0 - x)%xx, (y0 - y)%yy));
+        points.push_back(Point2d((x0 - y)%xx, (y0 - x)%yy));
+        points.push_back(Point2d((x0 + y)%xx, (y0 - x)%yy));
+        points.push_back(Point2d((x0 + x)%xx, (y0 - y)%yy));
 
         if (err <= 0)
         {

@@ -6,6 +6,7 @@
 #include "../featuredetection/Corner.h"
 #include "../util.h"
 #include "../ml/kmeans/KMeans.h"
+#include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace cv;
@@ -39,4 +40,12 @@ vector<double> RetinaUtils::findOpticalDisk(Mat &image)
     KMeans kmeans(initialCentroids);
     vector<int> tags = kmeans.execute(corners);
     return KMeans::findBiggestCentroid(tags, kmeans.getCentroids());
+}
+
+cv::Mat RetinaUtils::drawOpticalDiskLocation(std::vector<double> opticalDisk, cv::Mat &image)
+{
+    Mat clone = image.clone();
+    circle(clone, cv::Point(opticalDisk[0], opticalDisk[1]), 4, Scalar(0 ));
+
+    return clone;
 }

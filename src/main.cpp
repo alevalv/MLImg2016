@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
         Mat image = reader.readImageAbsolute(target_image_path);
         vector<double> od = RetinaUtils::findOpticalDisk(image);
 
-        cout << Util::getCircle(od[0], od[1], 10);
+        cout << Util::getCircle(od[0], od[1], 10, 1000, 1000);
     }
     else if (corner || feature)
     {
@@ -161,8 +161,8 @@ int main(int argc, char *argv[])
             outputFile+="ta";
         }
         outputFile+=".png";
-        //Util::showImage(seg);
-        reader.saveImage(seg, outputFile);
+        Util::showImage(seg);
+        //reader.saveImage(seg, outputFile);
     }
     return 0;
 }
