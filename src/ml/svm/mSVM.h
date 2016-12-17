@@ -19,7 +19,11 @@ public:
 
     void train(std::map<int, std::array<std::vector<cv::Mat>, 2> > image, std::string savePath = "");
 
+    void train2(std::map<int, std::array<cv::Mat, 2> > image, std::string savePath = "");
+
     cv::Mat predict(cv::Mat &image);
+
+    cv::Mat predict2(cv::Mat &image);
 };
 
 

@@ -5,6 +5,8 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <random>
 #include "mSVM.h"
+#include "../../retina/RetinaUtils.h"
+#include "../../util.h"
 
 
 using namespace std;
@@ -69,6 +71,48 @@ void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
     }
 }
 
+//original image should have three channels, 1st with original green, 2nd with first gradient and 3rd with second gradient
+void mSVM::train2(map<int, array<Mat, 2> > images, string savePath)
+{
+    Mat channels[3];
+    split(images[1][0], channels);
+
+    vector<double> opticalDisk = RetinaUtils::findOpticalDisk(channels[0]);
+
+    vector<Point2d> points;
+    for (int i=10; i <=40; i+=10)
+    {
+        vector<Point2d> tmpPoints = Util::getCircle(opticalDisk[0], opticalDisk[1], i);
+        points.insert(std::end(points), std::begin(tmpPoints), std::end(tmpPoints));
+    }
+
+    Mat trainingData(points.size(), 5, CV_32F, 0.0);
+    Mat labels(points.size(), 1, CV_32SC1, 0.0);
+
+    int currentTD = 0;
+    for (auto& point : points)
+    {
+        trainingData.at<float>(currentTD, 0) = channels[0].at<int>(point.x, point.y);
+        trainingData.at<float>(currentTD, 1) = channels[1].at<int>(point.x, point.y);
+        trainingData.at<float>(currentTD, 2) = channels[2].at<int>(point.x, point.y);
+        trainingData.at<float>(currentTD, 3) = point.x;
+        trainingData.at<float>(currentTD, 4) = point.y;
+
+        if (images[1][1].at<int>(point.x, point.y) > 50)
+        {
+            labels.at<int>(currentTD, 0) = 1;
+        }
+        currentTD++;
+    }
+
+    mSvm = ml::SVM::create();
+    mSvm->setType(ml::SVM::C_SVC);
+    mSvm->setKernel(ml::SVM::POLY);
+    mSvm->setGamma(3);
+    mSvm->setDegree(3);
+
+    mSvm->train(trainingData, ml::ROW_SAMPLE, labels);
+}
 Mat createWindow(Mat &image, int yy, int xx, int halfWS)
 {
     Mat output(1, (halfWS*2) * (halfWS*2), CV_32F);
@@ -78,6 +122,7 @@ Mat createWindow(Mat &image, int yy, int xx, int halfWS)
             output.at<int>(0, currentColumn++) = image.at<int>(y, x);
     return output;
 }
+
 Mat mSVM::predict(cv::Mat &image)
 {
     int halfWS = windowSize/2;
@@ -87,13 +132,39 @@ Mat mSVM::predict(cv::Mat &image)
     {
         for (int x = windowSize; x < (image.cols - windowSize); x++)
         {
-            Mat image = createWindow(image, y, x, halfWS);
-            float response = mSvm->predict(image);
+            Mat image2 = createWindow(image, y, x, halfWS);
+            float response = mSvm->predict(image2);
             if (response == 1)
                 outputImage.at<float>(y, x) = 255;
         }
-        cout << "Finish row:" << y << "\n";
     }
+    return outputImage;
+}
+
+Mat mSVM::predict2(cv::Mat &image)
+{
+    Mat channels[3];
+    split(image, channels);
+
+    Mat outputImage(image.rows, image.cols, CV_32SC1, 0.0);
+    cout<<"2Evaluating "<<image.rows*image.cols<<" pixels\n";
+    for (int y = 0; y < outputImage.rows; y++)
+    {
+        for (int x = 0; x < outputImage.cols ; x++)
+        {
+            Mat currentpix(1, 5, CV_32FC1);
+            currentpix.at<float>(0, 0) = channels[0].at<float>(y, x);
+            currentpix.at<float>(0, 1) = channels[1].at<float>(y, x);
+            currentpix.at<float>(0, 2) = channels[2].at<float>(y, x);
+            currentpix.at<float>(0, 3) = y;
+            currentpix.at<float>(0, 4) = x;
+
+            float response = mSvm->predict(currentpix);
+            if (response == 1)
+                outputImage.at<float>(y, x) = 1;
+        }
+    }
+    cout<<"kha"<<endl;
     return outputImage;
 }
 

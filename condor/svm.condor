@@ -2,9 +2,10 @@ executable = exe
 transfer_input_files = DRIVE
 error = err_svm
 log = log_svm
+output = out_svm
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_output_files = svm0-20.png
-Requirements = UidDomain =!= "uvcluster-08.cloud.univalle.edu.co"
-arguments = "-s -d DRIVE/ -k 0 -w 20 -g test/1st_manual/ -o test/images/ -t DRIVE/training/images/21_training.tif"
-queue
+transfer_output_files = svm$(Process)-$(window)t$(svm).png
+Requirements = UidDomain == "cloud.univalle.edu.co"
+arguments = "-$(svm) -d DRIVE/ -k $(Process) -w $(window) -i 1000 -g test/1st_manual/ -o test/images/ -t training/images/22_training.tif"
+queue 5

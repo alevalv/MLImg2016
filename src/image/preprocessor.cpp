@@ -52,7 +52,7 @@ const function<Mat(Mat &)> Preprocessor::GREEN_DUAL_GRADIENT = [](Mat &image) ->
 
     GaussianBlur(EXTRACT_GREEN(image), green, Size(3, 3), 0, 0);
 
-    merge(vector<Mat>{image, GRADIENT(image), GRADIENT2(image)}, output);
+    merge(vector<Mat>{green, GRADIENT(green), GRADIENT2(green)}, output);
 
     return output;
 };

@@ -1,0 +1,21 @@
+Job A svm.condor
+Job B svm.condor
+Job C svm.condor
+Job D svm.condor
+Job E svm.condor
+Job F svm.condor
+
+VARS A svm="s"
+VARS A window="10"
+VARS B svm="a"
+VARS B window="10"
+
+VARS C svm="s"
+VARS C window="20"
+VARS D svm="a"
+VARS D window="20"
+
+VARS E svm="s"
+VARS E window="30"
+VARS F svm="a"
+VARS F window="30"

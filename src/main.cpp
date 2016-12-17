@@ -15,36 +15,37 @@
 using namespace std;
 using namespace cv;
 
-#define USAGE "maclea -c -f -s -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
+#define USAGE "maclea -c -f -s -a -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
 
-static const char *optString = "cfsk:w:i:d:o:g:t:!:h?";
+static const char *optString = "cfsak:w:i:d:o:g:t:!:h?";
 
 static const struct option longOpts[] =
     {
-        {"corner", no_argument, NULL, 'c'},
-        {"feature", no_argument, NULL, 'f'},
-        {"mSVM", no_argument, NULL, 's'},
-        {"kernel-type", required_argument, NULL, 'k'},
-        {"window-size", required_argument, NULL, 'w'},
-        {"image-count", required_argument, NULL, 'i'},
-        {"help", no_argument, NULL, '?'},
-        {"image-directory", required_argument, NULL, 'd'},
+        {"corner",            no_argument,       NULL, 'c'},
+        {"feature",           no_argument,       NULL, 'f'},
+        {"mSVM",              no_argument,       NULL, 's'},
+        {"mSVM2",              no_argument,       NULL, 'a'},
+        {"kernel-type",       required_argument, NULL, 'k'},
+        {"window-size",       required_argument, NULL, 'w'},
+        {"image-count",       required_argument, NULL, 'i'},
+        {"help",              no_argument,       NULL, '?'},
+        {"image-directory",   required_argument, NULL, 'd'},
         {"sourcei-directory", required_argument, NULL, 'o'},
         {"groundt-directory", required_argument, NULL, 'g'},
-        {"target-image", required_argument, NULL, 't'},
-        {"k-means", no_argument, NULL, '0'}
+        {"target-image",      required_argument, NULL, 't'},
+        {"k-means",           no_argument,       NULL, '0'}
     };
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     bool testing = false;
     int option = 0;
-    int corner = 0, feature = 0, use_svm = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
+    int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
     if (argc < 2)
     {
-        cout<<USAGE;
+        cout << USAGE;
         exit(EXIT_FAILURE);
     }
     while ((option = getopt_long(argc, argv, optString, longOpts, &long_index)) != -1)
@@ -59,6 +60,9 @@ int main(int argc, char* argv[])
                 break;
             case 's':
                 use_svm = 1;
+                break;
+            case 'a':
+                use_svm2 = 1;
                 break;
             case 'k':
                 kernel = atoi(optarg);
@@ -89,7 +93,7 @@ int main(int argc, char* argv[])
             case 'h':
             case '?':
             default:
-                cout<<USAGE;
+                cout << USAGE;
                 exit(EXIT_FAILURE);
                 break;
         }
@@ -104,7 +108,7 @@ int main(int argc, char* argv[])
         Mat image = reader.readImageAbsolute(target_image_path);
         vector<double> od = RetinaUtils::findOpticalDisk(image);
 
-        cout<<Util::getCircle(od[0], od[1], 10);
+        cout << Util::getCircle(od[0], od[1], 10);
     }
     else if (corner || feature)
     {
@@ -126,22 +130,38 @@ int main(int argc, char* argv[])
             reader.saveImage(image, "surf.png");
         }
     }
-    else if (use_svm)
+    else if (use_svm || use_svm2)
     {
         if (source_images_dir.empty() || ground_truth_dir.empty())
         {
-            cout<<"-o and -g are mandatory for -s\n";
+            cout << "-o and -g are mandatory for -s\n";
             exit(EXIT_FAILURE);
         }
-        reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
-        DataMaker maker(image_count, 100);
-        map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
-        mSVM mSvm(window_size, kernel);
-        mSvm.train(maker.createData(images));
-        Mat image = reader.readImageAbsolute(target_image_path); // /home/alevalv/Maestria/MacLea/SourceCode/DRIVE/training/images/21_training.tif
-        Mat seg = mSvm.predict(image);
-        string outputFile = "svm" + to_string(kernel) + "-" + to_string(window_size) + ".png";
-
+        Mat seg;
+        string outputFile = "svm" + to_string(kernel) + "-" + to_string(window_size);
+        if (use_svm)
+        {
+            reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
+            DataMaker maker(image_count, 100);
+            map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
+            mSVM mSvm(window_size, kernel);
+            mSvm.train(maker.createData(images));
+            Mat image = reader.readImage(target_image_path);
+            seg = mSvm.predict(image);
+            outputFile+="ts";
+        }
+        else
+        {
+            reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
+            map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
+            mSVM mSvm(window_size, kernel);
+            mSvm.train2(images);
+            Mat image = reader.readImage(target_image_path);
+            seg = mSvm.predict2(image);
+            outputFile+="ta";
+        }
+        outputFile+=".png";
+        //Util::showImage(seg);
         reader.saveImage(seg, outputFile);
     }
     return 0;

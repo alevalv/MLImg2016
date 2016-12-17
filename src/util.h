@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include <random>
+#include <functional>
 
 class Util
 {
