@@ -17,14 +17,14 @@ using namespace cv;
 
 #define USAGE "maclea -c -f -s -a -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
 
-static const char *optString = "cfsak:w:i:d:o:g:t:!:h?";
+static const char *optString = "cfsa:k:w:i:d:o:g:t:!:h?";
 
 static const struct option longOpts[] =
     {
         {"corner",            no_argument,       NULL, 'c'},
         {"feature",           no_argument,       NULL, 'f'},
         {"mSVM",              no_argument,       NULL, 's'},
-        {"mSVM2",              no_argument,       NULL, 'a'},
+        {"mSVM2",             required_argument, NULL, 'a'},
         {"kernel-type",       required_argument, NULL, 'k'},
         {"window-size",       required_argument, NULL, 'w'},
         {"image-count",       required_argument, NULL, 'i'},
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
     bool testing = false;
     int option = 0;
-    int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
+    int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_corner = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
     if (argc < 2)
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
                 break;
             case 'a':
                 use_svm2 = 1;
+                use_corner = atoi(optarg);
                 break;
             case 'k':
                 kernel = atoi(optarg);
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
     if (testing)
     {
         Mat image = reader.readImageAbsolute(target_image_path);
-        vector<double> od = RetinaUtils::findOpticalDisk(image);
+        vector<double> od = RetinaUtils::findOpticalDisk(image, false);
 
         cout << Util::getCircle(od[0], od[1], 10, 1000, 1000);
     }
@@ -120,13 +121,13 @@ int main(int argc, char *argv[])
         }
         if (corner)
         {
-            Corner corner(200);
-            corner.runAll(reader, images[0], "corner");
+            Corner cornerC;
+            cornerC.runAll(reader, images[0], "corner");
         }
         else
         {
-            Feature feature(400);
-            Mat image = feature.SURFDrawImage(images[0]);
+            Feature featureC;
+            Mat image = featureC.SURFDrawImage(images[0]);
             reader.saveImage(image, "surf.png");
         }
     }
@@ -155,7 +156,7 @@ int main(int argc, char *argv[])
             reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
             map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
             mSVM mSvm(window_size, kernel);
-            mSvm.train2(images);
+            mSvm.train2(images, use_corner);
             Mat image = reader.readImage(target_image_path);
             seg = mSvm.predict2(image);
             outputFile+="ta";

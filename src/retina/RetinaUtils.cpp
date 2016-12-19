@@ -6,15 +6,25 @@
 #include "../featuredetection/Corner.h"
 #include "../util.h"
 #include "../ml/kmeans/KMeans.h"
+#include "../featuredetection/Feature.h"
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace cv;
 
-vector<double> RetinaUtils::findOpticalDisk(Mat &image)
+vector<double> RetinaUtils::findOpticalDisk(Mat &image, bool useCorners)
 {
-    Corner corner(200);
-    vector<vector<double> > corners = corner.shiTomasiGetCorners(image);
+    vector<vector<double> > corners;
+    if (useCorners)
+    {
+        Corner corner;
+        corners = corner.shiTomasiGetCorners(image);
+    }
+    else
+    {
+        Feature feature;
+        corners = feature.SURF(image);
+    }
     vector<vector<double> > initialCentroids(3, vector<double>(2, 0));
 
     /*
@@ -45,7 +55,7 @@ vector<double> RetinaUtils::findOpticalDisk(Mat &image)
 cv::Mat RetinaUtils::drawOpticalDiskLocation(std::vector<double> opticalDisk, cv::Mat &image)
 {
     Mat clone = image.clone();
-    circle(clone, cv::Point(opticalDisk[0], opticalDisk[1]), 4, Scalar(0 ));
+    circle(clone, cv::Point(opticalDisk[0], opticalDisk[1]), 4, Scalar(255), -1, 8, 0);
 
     return clone;
 }

@@ -108,6 +108,7 @@ map<int, array<Mat, 2> > ImgReader::readWithGroundTruth(string originalImagePath
     for (string imageName : imageFilenames)
     {
         int id = atoi(imageName.substr(0, imageName.find(numberDelim)).c_str());
+        //cout<<"Reading: "+ originalImagePath + imageName + "\n";
         Mat image = readImage(originalImagePath + imageName);
         images[id][0] = image;
     }
@@ -116,6 +117,8 @@ map<int, array<Mat, 2> > ImgReader::readWithGroundTruth(string originalImagePath
     for (string imageName : imageFilenames)
     {
         int id = atoi(imageName.substr(0, imageName.find(numberDelim)).c_str());
+
+        //cout<<"Reading: "+ groundTruthPath + imageName + "\n";
         Mat image = readImageNoPreprocessing(groundTruthPath + imageName);
         images[id][1] = image;
     }

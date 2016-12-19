@@ -11,7 +11,7 @@ class Feature
 {
     int minHessian;
 public:
-    Feature(int minHessian);
+    Feature(int minHessian = 400);
     cv::Mat SURFDrawImage(cv::Mat &image);
     std::vector<std::vector<double> > SURF(cv::Mat &image);
 };

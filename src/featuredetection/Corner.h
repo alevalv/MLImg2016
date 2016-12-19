@@ -12,7 +12,7 @@ class Corner
 {
     int threshold;
 public:
-    Corner(int threshold);
+    Corner(int threshold = 200);
 
     cv::Mat harrisDrawImage(const cv::Mat &image);
 

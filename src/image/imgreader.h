@@ -7,6 +7,13 @@
 #include <functional>
 #include "preprocessor.h"
 
+/**
+ * Known issues;
+ *
+ * ImgReader will fail if there are files that are not images in the directory that is being read.
+ *
+ * TODO add filtering when reading a directory.
+ */
 class ImgReader
 {
     std::string baseurl;

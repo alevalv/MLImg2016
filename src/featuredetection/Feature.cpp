@@ -24,12 +24,12 @@ Mat Feature::SURFDrawImage(Mat &image)
     detector->detect(image, keypoints);
 
     Mat drawImage;
-    drawKeypoints(image, keypoints, drawImage, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+    drawKeypoints(image, keypoints, drawImage, Scalar(0), DrawMatchesFlags::DEFAULT);
 
     return drawImage;
 }
 
-vector<vector<double> > Feature::SURF(cv::Mat &image)
+vector<vector<double> > Feature::SURF(Mat &image)
 {
     Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(minHessian);
 

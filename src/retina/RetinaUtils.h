@@ -10,7 +10,7 @@
 class RetinaUtils
 {
 public:
-    static std::vector<double> findOpticalDisk(cv::Mat& image);
+    static std::vector<double> findOpticalDisk(cv::Mat& image, bool useCorners);
     static cv::Mat drawOpticalDiskLocation(std::vector<double> opticalDisk, cv::Mat& image);
 };
 

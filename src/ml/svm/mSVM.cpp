@@ -9,7 +9,6 @@
 #include "../../util.h"
 #include "../../../lib/prettyprint.hpp"
 
-
 using namespace std;
 using namespace cv;
 
@@ -73,7 +72,7 @@ void mSVM::train(map<int, array<vector<Mat>, 2> > images, string savePath)
 }
 
 //original image should have three channels, 1st with original green, 2nd with first gradient and 3rd with second gradient
-void mSVM::train2(map<int, array<Mat, 2> > images, string savePath)
+void mSVM::train2(map<int, array<Mat, 2> > images, bool useCorners, string savePath)
 {
 
     vector<Mat> trainingDataVector;
@@ -85,7 +84,8 @@ void mSVM::train2(map<int, array<Mat, 2> > images, string savePath)
         Mat channels[3];
         split(item.second[0], channels);
 
-        vector<double> opticalDisk = RetinaUtils::findOpticalDisk(channels[0]);
+        vector<double> opticalDisk = RetinaUtils::findOpticalDisk(channels[0], useCorners);
+
         //Util::showImage(RetinaUtils::drawOpticalDiskLocation(opticalDisk, channels[0]));
         //cout<<item.first<<" "<<opticalDisk<<endl;
 
