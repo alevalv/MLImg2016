@@ -52,14 +52,14 @@ double Util::distance(vector<vector<double> > &element1,
                       vector<vector<double> > &element2,
                       function<double(vector<double> &, vector<double> &)> fun)
 {
-    double distance = 0;
+    double totalDistance = 0;
 
     for (int i = 0; i < element1.size(); i++)
     {
-        distance += fun(element1[i], element2[i]);
+        totalDistance += fun(element1[i], element2[i]);
     }
 
-    return distance;
+    return totalDistance;
 }
 
 void Util::showImage(const Mat& image)

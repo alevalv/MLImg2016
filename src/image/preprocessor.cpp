@@ -17,12 +17,12 @@ const function<Mat(Mat &)> Preprocessor::EXTRACT_GREEN = [](Mat &image) -> Mat
     return channels[1];
 };
 
-const function<Mat(Mat &)> Preprocessor::GRADIENT = [](Mat &image) -> Mat
+const function<Mat(Mat &, int)> Preprocessor::GRADIENT_SCALE = [](Mat &image, int scale) -> Mat
 {
     Mat outputX, outputY, abX, abY;
     Mat output(image.rows, image.cols, CV_8UC1, 0.0);
 
-    Sobel(image, outputX, CV_32FC1, 1, 0);
+    Sobel(image, outputX, CV_32FC1, 1, 0, 3, scale);
     Sobel(image, outputY, CV_32FC1, 0, 1);
     convertScaleAbs(outputX, abX);
     convertScaleAbs(outputY, abY);
@@ -38,12 +38,22 @@ const function<Mat(Mat &)> Preprocessor::GRADIENT = [](Mat &image) -> Mat
     return output;
 };
 
-const function<Mat(Mat &)> Preprocessor::GRADIENT2 = [](Mat &image) -> Mat
+const function<Mat(Mat &)> Preprocessor::GRADIENT = [](Mat &image) -> Mat
+{
+    return GRADIENT_SCALE(image, 1);
+};
+
+const function<Mat(Mat &, int)> Preprocessor::GRADIENT2_SCALE = [](Mat &image, int scale) -> Mat
 {
     Mat output;
-    Laplacian(image, output, CV_8UC1);
+    Laplacian(image, output, CV_8UC1, 1, scale);
 
     return output;
+};
+
+const function<Mat(Mat &)> Preprocessor::GRADIENT2 = [](Mat &image) -> Mat
+{
+    return GRADIENT2_SCALE(image, 1);
 };
 
 const function<Mat(Mat &)> Preprocessor::GREEN_DUAL_GRADIENT = [](Mat &image) -> Mat

@@ -5,6 +5,7 @@
 #ifndef MACLEA_SVM_H
 #define MACLEA_SVM_H
 
+#include <functional>
 #include <opencv2/xfeatures2d.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -14,12 +15,13 @@ class mSVM
     int windowSize;
     int kernel;
     cv::Ptr<cv::ml::SVM> mSvm;
+    std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> dataMaker;
 public:
-    mSVM(int windowSize = 20, int kernel = cv::ml::SVM::LINEAR);
+    mSVM(const std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> &dataMaker, int windowSize = 20, int kernel = cv::ml::SVM::LINEAR);
 
-    void train(std::map<int, std::array<std::vector<cv::Mat>, 2> > image, std::string savePath = "");
+    void train(std::map<int, std::array<cv::Mat, 2> > image);
 
-    void train2(std::map<int, std::array<cv::Mat, 2> > image, bool useCorners = true, std::string savePath = "");
+    void setDataMaker(const std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> &dataMaker);
 
     cv::Mat predict(cv::Mat &image);
 

@@ -7,16 +7,22 @@
 
 
 #include <opencv2/opencv.hpp>
-#include <array>
-#include <map>
 
 class DataMaker
 {
-    int maxCountImages, threshold, windowSize;
 public:
-    DataMaker(int maxCountImages, int threshold, int windowSize = 30);
-    std::map<int, std::array<std::vector<cv::Mat>,2> > createData(std::map<int, std::array<cv::Mat, 2> > &inputImages);
-    std::map<int, std::array<std::vector<cv::Mat>, 2>> createData2(std::map<int, std::array<cv::Mat, 2> > &inputImages);
+    static int maxCountImages;
+    static int windowSize;
+
+    static std::map<int, std::array<std::vector<cv::Mat>, 2> > createData(
+        std::map<int, std::array<cv::Mat, 2> > &inputImages,
+        int threshold = 100);
+
+    static const std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> OPTICAL_DISK_CORNERS;
+
+    static const std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> OPTICAL_DISK_SURF;
+
+    static const std::function<std::array<cv::Mat, 2>(std::map<int, std::array<cv::Mat, 2> > &)> WINDOW;
 };
 
 #endif //MACLEA_DATAMAKER_H

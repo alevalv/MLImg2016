@@ -1,5 +1,5 @@
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <getopt.h>
 #include "image/imgreader.h"
@@ -11,13 +11,14 @@
 #include "util.h"
 #include "retina/RetinaUtils.h"
 #include "../lib/prettyprint.hpp"
+#include "ml/knearest/KNearest.h"
 
 using namespace std;
 using namespace cv;
 
 #define USAGE "maclea -c -f -s -a -k kernel_type -w window_size -i image_count -d image_dir -o source_dir(relpath) -g groundt_dir(relpath) -t target_image_path \n"
 
-static const char *optString = "cfsa:k:w:i:d:o:g:t:!:h?";
+static const char *optString = "cfsna:k:w:i:d:o:g:t:!:h?";
 
 static const struct option longOpts[] =
     {
@@ -40,7 +41,8 @@ int main(int argc, char *argv[])
 {
     bool testing = false;
     int option = 0;
-    int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_corner = 0, use_kmeans = 0, kernel = -1, window_size = 30, image_count = 5000;
+    int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_corner = 0, use_kmeans = 0, use_knearest = 0,
+        kernel = -1, window_size = 30, image_count = 5000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
     if (argc < 2)
@@ -90,6 +92,9 @@ int main(int argc, char *argv[])
                 break;
             case '0':
                 use_kmeans = 1;
+                break;
+            case 'n':
+                use_knearest = 1;
                 break;
             case 'h':
             case '?':
@@ -142,11 +147,12 @@ int main(int argc, char *argv[])
         string outputFile = "svm" + to_string(kernel) + "-" + to_string(window_size);
         if (use_svm)
         {
+            DataMaker::maxCountImages = image_count;
+            DataMaker::windowSize = window_size;
             reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
-            DataMaker maker(image_count, 100);
             map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
-            mSVM mSvm(window_size, kernel);
-            mSvm.train(maker.createData(images));
+            mSVM mSvm(DataMaker::WINDOW, window_size, kernel);
+            mSvm.train(images);
             Mat image = reader.readImage(target_image_path);
             seg = mSvm.predict(image);
             outputFile+="ts";
@@ -155,15 +161,30 @@ int main(int argc, char *argv[])
         {
             reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
             map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
-            mSVM mSvm(window_size, kernel);
-            mSvm.train2(images, use_corner);
+            mSVM mSVM(DataMaker::OPTICAL_DISK_SURF, window_size, kernel);
+            if (use_corner)
+            {
+                mSVM.setDataMaker(DataMaker::OPTICAL_DISK_CORNERS);
+            }
+            mSVM.train(images);
             Mat image = reader.readImage(target_image_path);
-            seg = mSvm.predict2(image);
+            seg = mSVM.predict2(image);
             outputFile+="ta";
         }
         outputFile+=".png";
         Util::showImage(seg);
         //reader.saveImage(seg, outputFile);
+    }
+    else if(use_knearest)
+    {
+        reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
+        map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
+
+        Mat image = reader.readImage(target_image_path);
+        KNearest knearest(DataMaker::OPTICAL_DISK_CORNERS);
+        knearest.train(images);
+        Mat output = knearest.predict(image);
+        Util::showImage(output);
     }
     return 0;
 }
