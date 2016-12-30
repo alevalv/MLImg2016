@@ -17,9 +17,9 @@ KNearest::KNearest(const std::function<std::array<cv::Mat, 2>(std::map<int, std:
 void KNearest::train(map<int, array<Mat, 2> > images)
 {
     array<Mat, 2> data = dataMaker(images);
-    cout<<"input vectors: "<<data[0].rows<<" features: "<<data[0].cols<<"\n";
+    cout<<"Input vectors: "<<data[0].rows<<" features: "<<data[0].cols<<"\n";
     knearest = ml::KNearest::create();
-    knearest->setAlgorithmType(ml::KNearest::KDTREE);
+    knearest->setAlgorithmType(ml::KNearest::BRUTE_FORCE);
     knearest->setIsClassifier(true);
     knearest->train(data[0], ml::ROW_SAMPLE, data[1]);
 }
@@ -30,10 +30,10 @@ cv::Mat KNearest::predict(cv::Mat &image)
     split(image, channels);
 
     Mat outputImage(image.rows, image.cols, CV_32SC1, 0.0);
-    cout<<"2Evaluating "<<image.rows*image.cols<<" pixels\n";
+    cout<<"KNearest-Evaluating:"<<image.rows*image.cols<<" pixels\n";
     for (int y = 0; y < outputImage.rows; y++)
     {
-        for (int x = 0; x < outputImage.cols ; x++)
+        for (int x = 0; x < outputImage.cols; x++)
         {
             Mat currentpix(1, 3, CV_32FC1);
             currentpix.at<float>(0, 0) = channels[0].at<float>(y, x);

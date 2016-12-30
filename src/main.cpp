@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         string outputFile = "svm" + to_string(kernel) + "-" + to_string(window_size);
         if (use_svm)
         {
-            DataMaker::maxCountImages = image_count;
+            DataMaker::maxCount = image_count;
             DataMaker::windowSize = window_size;
             reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
             map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
@@ -177,11 +177,12 @@ int main(int argc, char *argv[])
     }
     else if(use_knearest)
     {
+        DataMaker::maxCount = 4100;
         reader.setPreprocessing(Preprocessor::GREEN_DUAL_GRADIENT);
         map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
 
         Mat image = reader.readImage(target_image_path);
-        KNearest knearest(DataMaker::OPTICAL_DISK_CORNERS);
+        KNearest knearest(DataMaker::RANDOM_PIXELS);
         knearest.train(images);
         Mat output = knearest.predict(image);
         Util::showImage(output);

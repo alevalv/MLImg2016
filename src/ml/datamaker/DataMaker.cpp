@@ -13,8 +13,9 @@
 using namespace std;
 using namespace cv;
 
-int DataMaker::maxCountImages = 1000;
+int DataMaker::maxCount = 1000;
 int DataMaker::windowSize = 30;
+
 /**
  * this method creates a set of windows for all given images, sorting them in two groups, one that in the center has
  * a pixel that is a vein and one that does not.
@@ -34,14 +35,14 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(
         {
             for (int x = windowSize; x < (oImage.cols - windowSize); x++)
             {
-                if (currentImageCountYes < maxCountImages && oImage.at<int>(y, x) > threshold &&
+                if (currentImageCountYes < maxCount && oImage.at<int>(y, x) > threshold &&
                     gtImage.at<int>(y, x) > threshold)
                 {
                     Rect roi(x - halfWS, y - halfWS, windowSize, windowSize);
                     createdImages[item.first][0].push_back(oImage(roi));
                     currentImageCountYes++;
                 }
-                if (currentImageCountNo < (maxCountImages * 8) && oImage.at<int>(y, x) > threshold &&
+                if (currentImageCountNo < (maxCount * 8) && oImage.at<int>(y, x) > threshold &&
                     gtImage.at<int>(y, x) < threshold)
                 {
                     Rect roi(y - halfWS, x - halfWS, windowSize, windowSize);
@@ -57,7 +58,7 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(
         0x9908b0df, 11,
         0xffffffff, 7,
         0x9d2c5680, 15,
-        0xefc60000, 18, 1812433253> random;
+        0xefc60000, 18, 1812433253> random;  //TODO make it truly random
     for (auto &item : createdImages)
     {
         unordered_set<long> selectedImageIds;
@@ -155,71 +156,114 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &, bool)> OPTICAL_DISK = [
     return output;
 };
 
-const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::OPTICAL_DISK_CORNERS =
-    [](map<int, array<Mat, 2> > &images) -> array<Mat, 2>
-    {
-        return OPTICAL_DISK(images, true);
-    };
+const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::OPTICAL_DISK_CORNERS = [](
+    map<int, array<Mat, 2> > &images) -> array<Mat, 2>
+{
+    return OPTICAL_DISK(images, true);
+};
 
-const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::OPTICAL_DISK_SURF =
-    [](map<int, array<Mat, 2> > &images) -> array<Mat, 2>
-    {
-        return OPTICAL_DISK(images, false);
-    };
+const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::OPTICAL_DISK_SURF = [](
+    map<int, array<Mat, 2> > &images) -> array<Mat, 2>
+{
+    return OPTICAL_DISK(images, false);
+};
 
-const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::WINDOW =
-    [](map<int, array<Mat, 2> > &inputImages) -> array<Mat, 2>
+const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::WINDOW = [](
+    map<int, array<Mat, 2> > &inputImages) -> array<Mat, 2>
+{
+    map<int, array<vector<Mat>, 2> > images = createData(inputImages);
+    int imageCount = 0;
+    int imageSize = images[1][0][0].cols * images[1][0][0].rows;
+    int windowSize = images[1][0][0].cols;
+    for (auto const &item : images)
     {
-        map<int, array<vector<Mat>, 2> > images = createData(inputImages);
-        int imageCount = 0;
-        int imageSize = images[1][0][0].cols * images[1][0][0].rows;
-        int windowSize = images[1][0][0].cols;
-        for (auto const &item : images)
+        imageCount += 60;
+        //imageCount+=item.second[0].size() + item.second[1].size();
+    }
+    //cout<<imageCount<<":"<<imageSize<<endl;
+
+    Mat trainingData(imageCount, imageSize, CV_32F);
+
+    mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
+        0x9908b0df, 11,
+        0xffffffff, 7,
+        0x9d2c5680, 15,
+        0xefc60000, 18, 1812433253> random;
+
+    int currentImage = 0;
+    for (auto const &item: images)
+    {
+        for (int cmi = 0; cmi < 30; cmi++)
         {
-            imageCount += 60;
-            //imageCount+=item.second[0].size() + item.second[1].size();
-        }
-        //cout<<imageCount<<":"<<imageSize<<endl;
-
-        Mat trainingData(imageCount, imageSize, CV_32F);
-
-        mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
-            0x9908b0df, 11,
-            0xffffffff, 7,
-            0x9d2c5680, 15,
-            0xefc60000, 18, 1812433253> random;
-
-        int currentImage = 0;
-        for (auto const &item: images)
-        {
-            for (int cmi = 0; cmi < 30; cmi++)
+            long randomImage = random() % item.second[0].size();
+            int currentColumn = 0;
+            for (int y = 0; y < item.second[0][randomImage].rows; y++)
             {
-                long randomImage = random() % item.second[0].size();
-                int currentColumn = 0;
-                for (int y = 0; y < item.second[0][randomImage].rows; y++)
+                for (int x = 0; x < item.second[0][randomImage].cols; x++)
                 {
-                    for (int x = 0; x < item.second[0][randomImage].cols; x++)
-                    {
-                        trainingData.at<int>(currentImage, currentColumn) = item.second[0][randomImage].at<int>(y, x);
-                        trainingData.at<int>(currentImage + 1, currentColumn) =
-                            item.second[1][randomImage].at<int>(y, x);
-                        currentColumn++;
-                    }
+                    trainingData.at<int>(currentImage, currentColumn) = item.second[0][randomImage].at<int>(y, x);
+                    trainingData.at<int>(currentImage + 1, currentColumn) =
+                        item.second[1][randomImage].at<int>(y, x);
+                    currentColumn++;
                 }
-                currentImage += 2;
             }
+            currentImage += 2;
         }
+    }
 
-        Mat labels(imageCount, 1, CV_32SC1);
+    Mat labels(imageCount, 1, CV_32SC1);
 
-        for (int i = 1; i <= imageCount; i++)
+    for (int i = 1; i <= imageCount; i++)
+    {
+        labels.at<int>(i - 1, 0) = (i % 2);
+    }
+
+    array<Mat, 2> output;
+    output[0] = trainingData;
+    output[1] = labels;
+
+    return output;
+};
+
+const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::RANDOM_PIXELS = [](
+    map<int, array<Mat, 2> > &inputImages) -> array<Mat, 2>
+{
+    Mat trainingData(maxCount*(inputImages.size()), 3, CV_32FC1, 0.0);
+    Mat labels(maxCount*(inputImages.size()), 1, CV_32SC1);
+    int currentImage = 0;
+
+    mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
+        0x9908b0df, 11,
+        0xffffffff, 7,
+        0x9d2c5680, 15,
+        0xefc60000, 18, 1812433253> random;
+
+    for (auto &item : inputImages)
+    {
+        Mat channels[3];
+        split(item.second[0], channels);
+        while((currentImage+1) % maxCount)
         {
-            labels.at<int>(i - 1, 0) = (i % 2);
+            int x = random() % item.second[0].cols;
+            int y = random() % item.second[0].rows;
+            trainingData.at<int>(currentImage, 0) = channels[0].at<int>(y, x);
+            trainingData.at<int>(currentImage, 1) = channels[1].at<int>(y, x);
+            trainingData.at<int>(currentImage, 2) = channels[2].at<int>(y, x);
+            if (item.second[1].at<int>(y, x) > 50)
+            {
+                labels.at<int>(y, x) = 1;
+            }
+            else
+            {
+                labels.at<int>(y, x) = 0;
+            }
+            currentImage++;
         }
+    }
 
-        array<Mat, 2> output;
-        output[0] = trainingData;
-        output[1] = labels;
+    array<Mat, 2> output;
+    output[0] = trainingData;
+    output[1] = labels;
 
-        return output;
-    };
+    return output;
+};
