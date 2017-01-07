@@ -29,7 +29,6 @@ std::string Benchmark::getElapsedTime()
 {
     string output = "Elapsed time: ";
     output+=to_string(elapsedTime/1000000);
-    output+="\n";
 
     return output;
 }

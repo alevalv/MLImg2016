@@ -4,6 +4,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <chrono>
+#include <unordered_set>
 #include "KNearest.h"
 #include "../../util.h"
 #include "../../log/Logger.h"
@@ -33,9 +34,10 @@ cv::Mat KNearest::predict(cv::Mat &image)
     split(image, channels);
     Mat outputImage(image.rows, image.cols, CV_32SC1, 0.0);
     logger->info("KNearest-Evaluating:"+to_string(image.rows*image.cols)+" pixels\n");
+    std::unordered_set<float> responses;
     for (int y = 0; y < outputImage.rows; y++)
     {
-        //logger->info("crow:"+std::to_string(y)+"t:"+Benchmark::getCurrentTimeAndDate());
+        logger->info("crow:"+std::to_string(y)+"t:"+Benchmark::getCurrentTimeAndDate());
         for (int x = 0; x < outputImage.cols; x++)
         {
             Mat currentpix(1, 3, CV_32FC1);
@@ -44,7 +46,13 @@ cv::Mat KNearest::predict(cv::Mat &image)
             currentpix.at<float>(0, 2) = channels[2].at<float>(y, x);
 
             float response = knearest->predict(currentpix);
-            if (response > 0)
+            auto search = responses.find(response);
+            if (search == responses.end())
+            {
+                logger->info(to_string(response));
+                responses.insert(response);
+            }
+            if (response == 0.0)
                 outputImage.at<float>(y, x) = 255;
         }
     }

@@ -212,6 +212,7 @@ int main(int argc, char *argv[])
         benchmark.end();
         logger->info("KNearest-predict-"+benchmark.getElapsedTime());
         Util::showImage(output);
+        //reader.saveImage(output, "knearest.png");
     }
     return 0;
 }

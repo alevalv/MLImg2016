@@ -54,11 +54,8 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(
     }
 
     //randomly select the same quantity of images as yes for no category
-    mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
-        0x9908b0df, 11,
-        0xffffffff, 7,
-        0x9d2c5680, 15,
-        0xefc60000, 18, 1812433253> random;  //TODO make it truly random
+    random_device seeder;
+    mt19937 merRand(seeder());
     for (auto &item : createdImages)
     {
         unordered_set<long> selectedImageIds;
@@ -67,7 +64,7 @@ map<int, array<vector<Mat>, 2>> DataMaker::createData(
         vector<Mat> selectedImages;
         while (imageCount < maxImageCount)
         {
-            long imageId = random() % item.second[0].size();
+            long imageId = merRand() % item.second[0].size();
             if (selectedImageIds.find(imageId) == selectedImageIds.end())
             {
                 selectedImageIds.insert(imageId);
@@ -184,18 +181,15 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::WINDOW = []
 
     Mat trainingData(imageCount, imageSize, CV_32F);
 
-    mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
-        0x9908b0df, 11,
-        0xffffffff, 7,
-        0x9d2c5680, 15,
-        0xefc60000, 18, 1812433253> random;
+    random_device seeder;
+    mt19937 merRand(seeder());
 
     int currentImage = 0;
     for (auto const &item: images)
     {
         for (int cmi = 0; cmi < 30; cmi++)
         {
-            long randomImage = random() % item.second[0].size();
+            long randomImage = merRand() % item.second[0].size();
             int currentColumn = 0;
             for (int y = 0; y < item.second[0][randomImage].rows; y++)
             {
@@ -232,11 +226,8 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::RANDOM_PIXE
     Mat labels(maxCount*(inputImages.size()), 1, CV_32SC1);
     int currentImage = 0;
 
-    mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
-        0x9908b0df, 11,
-        0xffffffff, 7,
-        0x9d2c5680, 15,
-        0xefc60000, 18, 1812433253> random;
+    random_device seeder;
+    mt19937 merRand(seeder());
 
     for (auto &item : inputImages)
     {
@@ -245,8 +236,8 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::RANDOM_PIXE
         int localCount = 0;
         while((localCount+1) % (maxCount+1))
         {
-            int x = random() % item.second[0].cols;
-            int y = random() % item.second[0].rows;
+            int x = merRand() % item.second[0].cols;
+            int y = merRand() % item.second[0].rows;
             trainingData.at<int>(currentImage, 0) = channels[0].at<int>(y, x);
             trainingData.at<int>(currentImage, 1) = channels[1].at<int>(y, x);
             trainingData.at<int>(currentImage, 2) = channels[2].at<int>(y, x);
