@@ -3,7 +3,9 @@
 //
 
 #include <opencv2/xfeatures2d.hpp>
+#include <chrono>
 #include "mSVM.h"
+#include "../../log/Logger.h"
 
 using namespace std;
 using namespace cv;
@@ -34,9 +36,10 @@ Mat mSVM::predict(cv::Mat &image)
 {
     int halfWS = windowSize/2;
     Mat outputImage(image.rows, image.cols, CV_8U, 0.0);
-    cout<<"Evaluating "<<image.rows*image.cols<<" pixels\n";
+    Logger::getLogger()->info("Evaluating "+to_string(image.rows*image.cols)+" pixels\n");
     for (int y = windowSize; y < (image.rows - windowSize); y++)
     {
+        //logger->info("crow:"+std::to_string(y)+"t:"+Benchmark::getCurrentTimeAndDate());
         for (int x = windowSize; x < (image.cols - windowSize); x++)
         {
             Mat image2 = createWindow(image, y, x, halfWS);
@@ -54,9 +57,10 @@ Mat mSVM::predict2(cv::Mat &image)
     split(image, channels);
 
     Mat outputImage(image.rows, image.cols, CV_32SC1, 0.0);
-    cout<<"2Evaluating "<<image.rows*image.cols<<" pixels\n";
+    Logger::getLogger()->info("Evaluating "+to_string(image.rows*image.cols)+" pixels\n");
     for (int y = 0; y < outputImage.rows; y++)
     {
+        //logger->info("crow:"+std::to_string(y)+"t:"+Benchmark::getCurrentTimeAndDate());
         for (int x = 0; x < outputImage.cols ; x++)
         {
             Mat currentpix(1, 3, CV_32FC1);

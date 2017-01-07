@@ -7,6 +7,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <functional>
+#include "../../Benchmark.h"
 
 class KNearest
 {

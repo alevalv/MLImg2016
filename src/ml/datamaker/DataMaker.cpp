@@ -242,7 +242,8 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::RANDOM_PIXE
     {
         Mat channels[3];
         split(item.second[0], channels);
-        while((currentImage+1) % maxCount)
+        int localCount = 0;
+        while((localCount+1) % (maxCount+1))
         {
             int x = random() % item.second[0].cols;
             int y = random() % item.second[0].rows;
@@ -258,6 +259,7 @@ const function<array<Mat, 2>(map<int, array<Mat, 2> > &)> DataMaker::RANDOM_PIXE
                 labels.at<int>(y, x) = 0;
             }
             currentImage++;
+            localCount++;
         }
     }
 

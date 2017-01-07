@@ -12,6 +12,7 @@
 #include "retina/RetinaUtils.h"
 #include "../lib/prettyprint.hpp"
 #include "ml/knearest/KNearest.h"
+#include "log/Logger.h"
 
 using namespace std;
 using namespace cv;
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
     bool testing = false;
     int option = 0;
     int corner = 0, feature = 0, use_svm = 0,  use_svm2 = 0, use_corner = 0, use_kmeans = 0, use_knearest = 0,
-        kernel = -1, window_size = 30, image_count = 5000;
+        kernel = -1, window_size = 30, image_count = 1000;
     int long_index;
     string image_dir, source_images_dir, ground_truth_dir, target_image_path;
     if (argc < 2)
@@ -108,7 +109,8 @@ int main(int argc, char *argv[])
     //sets the image reader with the given folder path
     ImgReader reader = ImgReader(image_dir);
     reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
-
+    Benchmark benchmark;
+    ILogger* logger = Logger::getLogger();
     if (testing)
     {
         Mat image = reader.readImageAbsolute(target_image_path);
@@ -127,12 +129,18 @@ int main(int argc, char *argv[])
         if (corner)
         {
             Corner cornerC;
+            benchmark.start();
             cornerC.runAll(reader, images[0], "corner");
+            benchmark.end();
+            logger->info("Corners-"+benchmark.getElapsedTime());
         }
         else
         {
             Feature featureC;
+            benchmark.start();
             Mat image = featureC.SURFDrawImage(images[0]);
+            benchmark.end();
+            logger->info("SURF-"+benchmark.getElapsedTime());
             reader.saveImage(image, "surf.png");
         }
     }
@@ -152,9 +160,15 @@ int main(int argc, char *argv[])
             reader.setPreprocessing(Preprocessor::EXTRACT_GREEN);
             map<int, std::array<Mat, 2> > images = reader.readWithGroundTruth(source_images_dir, ground_truth_dir, "_");
             mSVM mSvm(DataMaker::WINDOW, window_size, kernel);
+            benchmark.start();
             mSvm.train(images);
+            benchmark.end();
+            logger->info("SVM-train-"+benchmark.getElapsedTime());
             Mat image = reader.readImage(target_image_path);
+            benchmark.start();
             seg = mSvm.predict(image);
+            benchmark.end();
+            logger->info("SVM-predict-"+benchmark.getElapsedTime());
             outputFile+="ts";
         }
         else
@@ -166,9 +180,15 @@ int main(int argc, char *argv[])
             {
                 mSVM.setDataMaker(DataMaker::OPTICAL_DISK_CORNERS);
             }
+            benchmark.start();
             mSVM.train(images);
+            benchmark.end();
+            logger->info("SVMOD-train-"+benchmark.getElapsedTime());
             Mat image = reader.readImage(target_image_path);
+            benchmark.start();
             seg = mSVM.predict2(image);
+            benchmark.end();
+            logger->info("SVMOD-predict-"+benchmark.getElapsedTime());
             outputFile+="ta";
         }
         outputFile+=".png";
@@ -183,8 +203,14 @@ int main(int argc, char *argv[])
 
         Mat image = reader.readImage(target_image_path);
         KNearest knearest(DataMaker::RANDOM_PIXELS);
+        benchmark.start();
         knearest.train(images);
+        benchmark.end();
+        logger->info("KNearest-train-"+benchmark.getElapsedTime());
+        benchmark.start();
         Mat output = knearest.predict(image);
+        benchmark.end();
+        logger->info("KNearest-predict-"+benchmark.getElapsedTime());
         Util::showImage(output);
     }
     return 0;

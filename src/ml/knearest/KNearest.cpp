@@ -3,8 +3,10 @@
 //
 
 #include <opencv2/opencv.hpp>
+#include <chrono>
 #include "KNearest.h"
 #include "../../util.h"
+#include "../../log/Logger.h"
 
 using namespace std;
 using namespace cv;
@@ -17,7 +19,7 @@ KNearest::KNearest(const std::function<std::array<cv::Mat, 2>(std::map<int, std:
 void KNearest::train(map<int, array<Mat, 2> > images)
 {
     array<Mat, 2> data = dataMaker(images);
-    cout<<"Input vectors: "<<data[0].rows<<" features: "<<data[0].cols<<"\n";
+    Logger::getLogger()->info("Input vectors: "+to_string(data[0].rows)+" features: "+to_string(data[0].cols)+"\n");
     knearest = ml::KNearest::create();
     knearest->setAlgorithmType(ml::KNearest::BRUTE_FORCE);
     knearest->setIsClassifier(true);
@@ -26,13 +28,14 @@ void KNearest::train(map<int, array<Mat, 2> > images)
 
 cv::Mat KNearest::predict(cv::Mat &image)
 {
+    ILogger* logger = Logger::getLogger();
     Mat channels[3];
     split(image, channels);
-
     Mat outputImage(image.rows, image.cols, CV_32SC1, 0.0);
-    cout<<"KNearest-Evaluating:"<<image.rows*image.cols<<" pixels\n";
+    logger->info("KNearest-Evaluating:"+to_string(image.rows*image.cols)+" pixels\n");
     for (int y = 0; y < outputImage.rows; y++)
     {
+        //logger->info("crow:"+std::to_string(y)+"t:"+Benchmark::getCurrentTimeAndDate());
         for (int x = 0; x < outputImage.cols; x++)
         {
             Mat currentpix(1, 3, CV_32FC1);

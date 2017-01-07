@@ -30,7 +30,9 @@ set(core_SRC
     ml/knearest/KNearest.h
     util.cpp
     util.h
-    main.cpp)
+    Benchmark.cpp
+    Benchmark.h
+    main.cpp log/LoggerCont.cpp log/LoggerCont.h log/ILogger.h log/Logger.cpp log/Logger.h)
 
 add_library(core ${core_SRC})
 add_executable(exe main.cpp)
